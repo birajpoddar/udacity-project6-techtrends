@@ -111,4 +111,4 @@ if __name__ == "__main__":
    # Logging
    logging.basicConfig(level=logging.INFO)
 
-   app.run(host='0.0.0.0', port='3111')
+   app.run(host='0.0.0.0', port='3111', debug=False)
