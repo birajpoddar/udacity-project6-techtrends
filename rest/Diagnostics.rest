@@ -1,0 +1,10 @@
+GET http://localhost:3111/healthz HTTP/1.1
+
+###
+POST http://localhost:3111/healthz HTTP/1.1
+
+###
+GET http://localhost:3111/metrics HTTP/1.1
+
+###
+POST http://localhost:3111/metrics HTTP/1.1

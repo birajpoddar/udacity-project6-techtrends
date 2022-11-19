@@ -1,11 +1,33 @@
 import sqlite3
-
+import logging
 from flask import Flask, jsonify, json, render_template, request, url_for, redirect, flash
 from werkzeug.exceptions import abort
+import datetime
+
+# Metrics class
+class Metrics:
+    def __init__(self) -> None:
+        self.db_connection_count = 0
+        self.post_count = 0
+
+    def increase_connection_count(self):
+        self.db_connection_count += 1
+
+    def get_post_count(self):
+        connection = get_db_connection()
+        num_posts = connection.execute('SELECT count(*) as COUNT FROM posts')\
+            .fetchone()['COUNT']
+        connection.close()
+        return num_posts
+
+    def set_post_count(self):
+        self.post_count = self.get_post_count()
+
 
 # Function to get a database connection.
 # This function connects to database with the name `database.db`
 def get_db_connection():
+    metrics.increase_connection_count()
     connection = sqlite3.connect('database.db')
     connection.row_factory = sqlite3.Row
     return connection
@@ -36,13 +58,16 @@ def index():
 def post(post_id):
     post = get_post(post_id)
     if post is None:
+      logging.info(f'[{{datetime.datetime.now()}}] - No Article found!')
       return render_template('404.html'), 404
     else:
+      logging.info(f'[{datetime.datetime.now()}] - Article \'post["title"]\' retrieved!')
       return render_template('post.html', post=post)
 
 # Define the About Us page
 @app.route('/about')
 def about():
+    logging.info(f'[{datetime.datetime.now()}] - \'About us\' retrieved!')
     return render_template('about.html')
 
 # Define the post creation functionality 
@@ -61,10 +86,23 @@ def create():
             connection.commit()
             connection.close()
 
+            logging.info(f'[{datetime.datetime.now()}] - New Article \'{title}\' created!')
             return redirect(url_for('index'))
 
     return render_template('create.html')
 
+@app.route('/healthz')
+def healthcheck():
+    resp = { "result": "OK - healthy" }
+    return Flask.response_class(json.dumps(resp), status=200, mimetype="application/json")
+
+@app.route('/metrics')
+def metricscheck():
+    metrics.set_post_count()
+    return Flask.response_class(json.dumps(metrics.__dict__), status=200, mimetype="application/json")
+
 # start the application on port 3111
 if __name__ == "__main__":
+   # metrics object
+   metrics = Metrics()
    app.run(host='0.0.0.0', port='3111')
