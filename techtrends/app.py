@@ -23,6 +23,8 @@ class Metrics:
     def set_post_count(self):
         self.post_count = self.get_post_count()
 
+def getDateTime():
+    return datetime.datetime.now().__format__('%d/%h/%Y %H:%M:%S')
 
 # Function to get a database connection.
 # This function connects to database with the name `database.db`
@@ -58,16 +60,16 @@ def index():
 def post(post_id):
     post = get_post(post_id)
     if post is None:
-      logging.info(f'[{{datetime.datetime.now()}}] - No Article found!')
+      app.logger.info(f'[{getDateTime()}] - No Article found!')
       return render_template('404.html'), 404
     else:
-      logging.info(f'[{datetime.datetime.now()}] - Article \'post["title"]\' retrieved!')
+      app.logger.info(f'[{getDateTime()}] - Article \'{post["title"]}\' retrieved!')
       return render_template('post.html', post=post)
 
 # Define the About Us page
 @app.route('/about')
 def about():
-    logging.info(f'[{datetime.datetime.now()}] - \'About us\' retrieved!')
+    app.logger.info(f'[{getDateTime()}] - \'About us\' retrieved!')
     return render_template('about.html')
 
 # Define the post creation functionality 
@@ -86,7 +88,7 @@ def create():
             connection.commit()
             connection.close()
 
-            logging.info(f'[{datetime.datetime.now()}] - New Article \'{title}\' created!')
+            app.logger.info(f'[{getDateTime()}] - New Article \'{title}\' created!')
             return redirect(url_for('index'))
 
     return render_template('create.html')
@@ -105,4 +107,8 @@ def metricscheck():
 if __name__ == "__main__":
    # metrics object
    metrics = Metrics()
+   
+   # Logging
+   logging.basicConfig(level=logging.INFO)
+
    app.run(host='0.0.0.0', port='3111')
