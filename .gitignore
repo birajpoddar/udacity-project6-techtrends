@@ -1,0 +1,13 @@
+# OS Files
+.DS_Store
+
+# Virtual Env
+.env
+.venv
+.myvenv
+
+# Vagrant Files
+.vagrant
+
+# Python Cache Files
+__pycache__
