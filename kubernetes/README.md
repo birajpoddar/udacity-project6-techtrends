@@ -18,4 +18,4 @@ Added the resources, readiness and liveliness probes later
 
 ## balancer.yaml
 
-> kubectl expose --name=techtrends --port=8080 --target-port=3111 -f service.yaml --type=LoadBalancer -n sandbox --dry-run=client -o yaml > balancer.yaml
+> kubectl expose --name=techtrends-balancer --port=6111 --target-port=3111 -f service.yaml --type=LoadBalancer -n sandbox --dry-run=client -o yaml > balancer.yaml

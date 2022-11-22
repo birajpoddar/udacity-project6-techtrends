@@ -3,11 +3,11 @@ kind: Service
 metadata:
   labels:
     app: techtrends
-  name: techtrends
+  name: techtrends-balancer
   namespace: sandbox
 spec:
   ports:
-    - port: 8080
+    - port: 6111
       protocol: TCP
       targetPort: 3111
   selector:
