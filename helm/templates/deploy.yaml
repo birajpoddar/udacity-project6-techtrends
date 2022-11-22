@@ -22,7 +22,10 @@ spec:
           name: techtrends
           ports:
             - containerPort: {{ .Values.image.containerPort }}
+          resources:
 {{ toYaml .Values.resources | indent 12 }}
+          livenessProbe:
 {{ toYaml .Values.livenessProbe | indent 12 }}
+          readinessProbe:
 {{ toYaml .Values.readinessProbe | indent 12 }}
 status: {}
