@@ -25,8 +25,8 @@ resources:
 
 livenessProbe:
   path: /healthz
-  port: {{ .Values.image.containerPort }}
+  port: 3111
 
 readinessProbe:
   path: /healthz
-  port: {{ .Values.image/containerPort }}
+  port: 3111
