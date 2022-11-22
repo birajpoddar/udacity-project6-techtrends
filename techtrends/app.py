@@ -95,8 +95,13 @@ def create():
 
 @app.route('/healthz')
 def healthcheck():
-    resp = { "result": "OK - healthy" }
-    return Flask.response_class(json.dumps(resp), status=200, mimetype="application/json")
+    try:
+        metrics.set_post_count()
+        resp = { "result": "OK - healthy" }
+        return Flask.response_class(json.dumps(resp), status=200, mimetype="application/json")
+    except:
+        resp = { "result": "ERROR - unhealthy" }
+        return Flask.response_class(json.dumps(resp), status=500, mimetype="application/json")
 
 @app.route('/metrics')
 def metricscheck():
