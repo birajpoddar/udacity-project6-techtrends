@@ -11,3 +11,6 @@
 
 # Python Cache Files
 __pycache__
+
+# DB files
+*.db
