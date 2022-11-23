@@ -23,9 +23,6 @@ class Metrics:
     def set_post_count(self):
         self.post_count = self.get_post_count()
 
-def getDateTime():
-    return datetime.datetime.now().__format__('%d/%h/%Y %H:%M:%S')
-
 # Function to get a database connection.
 # This function connects to database with the name `database.db`
 def get_db_connection():
@@ -52,6 +49,7 @@ def index():
     connection = get_db_connection()
     posts = connection.execute('SELECT * FROM posts').fetchall()
     connection.close()
+    app.logger.info("'Home' retrieved!")
     return render_template('index.html', posts=posts)
 
 # Define how each individual article is rendered 
@@ -60,16 +58,16 @@ def index():
 def post(post_id):
     post = get_post(post_id)
     if post is None:
-      app.logger.info(f'[{getDateTime()}] - No Article found!')
+      app.logger.error('No Article found!')
       return render_template('404.html'), 404
     else:
-      app.logger.info(f'[{getDateTime()}] - Article \'{post["title"]}\' retrieved!')
+      app.logger.info("Article '%s' retrieved!", post["title"])
       return render_template('post.html', post=post)
 
 # Define the About Us page
 @app.route('/about')
 def about():
-    app.logger.info(f'[{getDateTime()}] - \'About us\' retrieved!')
+    app.logger.info("'About us' retrieved!")
     return render_template('about.html')
 
 # Define the post creation functionality 
@@ -88,7 +86,7 @@ def create():
             connection.commit()
             connection.close()
 
-            app.logger.info(f'[{getDateTime()}] - New Article \'{title}\' created!')
+            app.logger.info("New Article '%s' created!", title)
             return redirect(url_for('index'))
 
     return render_template('create.html')
@@ -97,9 +95,11 @@ def create():
 def healthcheck():
     try:
         metrics.set_post_count()
+        app.logger.info('The app is healthy')
         resp = { "result": "OK - healthy" }
         return Flask.response_class(json.dumps(resp), status=200, mimetype="application/json")
     except:
+        app.logger.error('DB connecivity may be down/Table may be missing')
         resp = { "result": "ERROR - unhealthy" }
         return Flask.response_class(json.dumps(resp), status=500, mimetype="application/json")
 
@@ -113,7 +113,15 @@ if __name__ == "__main__":
    # metrics object
    metrics = Metrics()
    
-   # Logging
-   logging.basicConfig(level=logging.INFO)
+   # Setting logger level to DEBUG
+   logging.basicConfig(level=logging.DEBUG)
+   
+   # app logger
+   logging.getLogger('app').handlers.clear()
+   app.logger.handlers.clear()
+   handler = logging.StreamHandler()
+   formatter = logging.Formatter('%(levelname)s:%(name)s: [%(asctime)s] -- %(message)s', datefmt='%d/%h/%Y %H:%M:%S')
+   handler.setFormatter(formatter)
+   app.logger.addHandler(handler)
 
    app.run(host='0.0.0.0', port='3111', debug=False)
